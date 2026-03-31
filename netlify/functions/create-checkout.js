@@ -37,8 +37,6 @@ export default async (req) => {
       mode: 'payment',
       success_url: successUrl,
       cancel_url: cancelUrl,
-      customer_creation: 'always',
-      customer_email_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU']
       },
