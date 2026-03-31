@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed — Symiian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1832; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; color: #fff; padding: 20px; }
+        .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 48px 40px; max-width: 540px; width: 100%; text-align: center; }
+        .check { width: 72px; height: 72px; background: rgba(78,205,196,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 34px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; }
+        .subtitle { color: rgba(255,255,255,0.6); font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
+        .custom-toggle { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; overflow: hidden; margin-bottom: 20px; text-align: left; }
+        .toggle-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; cursor: pointer; user-select: none; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); letter-spacing: 0.5px; text-transform: uppercase; }
+        .toggle-header:hover { background: rgba(255,255,255,0.04); }
+        .toggle-arrow { transition: transform 0.25s; font-size: 11px; opacity: 0.6; }
+        .toggle-arrow.open { transform: rotate(180deg); }
+        .toggle-body { display: none; padding: 0 18px 16px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .toggle-body.open { display: block; }
+        .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; gap: 12px; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: rgba(255,255,255,0.5); white-space: nowrap; }
+        .detail-value { color: rgba(255,255,255,0.9); font-weight: 500; text-align: right; word-break: break-all; }
+        .color-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; flex-shrink: 0; }
+        .color-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+        .color-item { display: flex; align-items: center; font-size: 12px; color: rgba(255,255,255,0.75); }
+        .color-item-name { color: rgba(255,255,255,0.45); margin-right: 6px; }
+        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 20px 0; }
+        .session-id { font-size: 11px; color: rgba(255,255,255,0.25); font-family: monospace; word-break: break-all; }
+        .btn { display: inline-block; margin-top: 24px; padding: 13px 32px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 50px; color: #fff; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.2s; }
+        .btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="check">✓</div>
+    <h1>Order Confirmed!</h1>
+    <p class="subtitle">Thank you for pre-ordering your Gamma D.<br>A confirmation email is on its way.</p>
+    <div class="custom-toggle">
+        <div class="toggle-header" onclick="toggleDetails()">
+            <span>Your Customizations</span>
+            <span class="toggle-arrow" id="toggle-arrow">▼</span>
+        </div>
+        <div class="toggle-body" id="toggle-body">
+            <div id="details-content" style="padding-top:12px;">
+                <p style="color:rgba(255,255,255,0.4);font-size:13px;">Loading...</p>
+            </div>
+        </div>
+    </div>
+    <hr class="divider">
+    <p class="session-id" id="session-id"></p>
+    <a href="/" class="btn">← Back to Customizer</a>
+</div>
+<script>
+    function toggleDetails() {
+        document.getElementById('toggle-body').classList.toggle('open');
+        document.getElementById('toggle-arrow').classList.toggle('open');
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (sessionId) {
+        document.getElementById('session-id').textContent = 'Order ref: ' + sessionId;
+        fetch('/api/get-session?session_id=' + sessionId)
+            .then(r => r.json())
+            .then(data => { if (data && data.metadata) renderCustomizations(data.metadata); })
+            .catch(() => {
+                document.getElementById('details-content').innerHTML =
+                    '<p style="color:rgba(255,255,255,0.4);font-size:13px;">Details will be in your confirmation email.</p>';
+            });
+    }
+
+    function renderCustomizations(meta) {
+        const container = document.getElementById('details-content');
+        let html = '';
+        if (meta.robotName && meta.robotName !== 'GAMMA') html += row('Robot Name', meta.robotName);
+        if (meta.gender) html += row('Head Style', capitalize(meta.gender));
+        if (meta.earVariant && meta.earVariant !== 'ears' && meta.earVariant !== 'default') html += row('Ear Style', meta.earVariant.replace('ear',''));
+        if (meta.total) html += row('Order Total', '$' + meta.total);
+        if (meta.colorDetails && meta.colorDetails !== 'Default (no changes)' && meta.colorDetails !== 'Default') {
+            const pairs = meta.colorDetails.split(' | ');
+            let colorHtml = '<div class="color-list">';
+            pairs.forEach(pair => {
+                const colonIdx = pair.lastIndexOf(': ');
+                if (colonIdx > -1) {
+                    const part = pair.substring(0, colonIdx).trim();
+                    const color = pair.substring(colonIdx + 2).trim();
+                    colorHtml += `<div class="color-item"><span class="color-swatch" style="background:${color}"></span><span class="color-item-name">${formatPartName(part)}:</span><span>${color}</span></div>`;
+                }
+            });
+            colorHtml += '</div>';
+            html += `<div class="detail-row" style="flex-direction:column;align-items:flex-start;"><span class="detail-label" style="margin-bottom:6px;">Colors (${pairs.length} parts)</span>${colorHtml}</div>`;
+            document.getElementById('toggle-body').classList.add('open');
+            document.getElementById('toggle-arrow').classList.add('open');
+        } else {
+            html += row('Colors', 'Default');
+        }
+        container.innerHTML = html || '<p style="color:rgba(255,255,255,0.4);font-size:13px;">Standard configuration.</p>';
+    }
+
+    function row(label, value) { return `<div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`; }
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+    function formatPartName(k) { return k.replace(/([A-Z])/g,' $1').replace(/_/g,' ').replace(/^./,s=>s.toUpperCase()).trim(); }
+</script>
+</body>
+</html>
