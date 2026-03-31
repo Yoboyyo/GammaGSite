@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed — Symiian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1832;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+        .card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 60px 48px;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+        }
+        .check {
+            width: 72px;
+            height: 72px;
+            background: rgba(78,205,196,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 28px;
+            font-size: 36px;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        p {
+            color: rgba(255,255,255,0.65);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 32px 0;
+        }
+        .session-id {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 32px;
+            padding: 14px 36px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="check">✓</div>
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for pre-ordering your Gamma D.</p>
+        <p>You'll receive a confirmation email shortly with your order details.</p>
+        <hr class="divider">
+        <p class="session-id" id="session-id"></p>
+        <a href="/" class="btn">← Back to Customizer</a>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session_id');
+        if (sessionId) {
+            document.getElementById('session-id').textContent = 'Order ref: ' + sessionId;
+        }
+    </script>
+</body>
+</html>
